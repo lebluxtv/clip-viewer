@@ -28,13 +28,15 @@
     </iframe>
 
     <script>
-        // Récupère le paramètre clip dans l'URL
         const params = new URLSearchParams(window.location.search);
         const clipId = params.get('clip');
+        const parent = params.get('parent') || location.hostname;
+        const autoplay = params.get('autoplay') || 'true';
+        const muted = params.get('muted') || 'true';
+
         if (clipId) {
-            // Charge l'iframe Twitch en autoplay + sans overlays
             const iframe = document.getElementById('player');
-            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${location.hostname}&autoplay=true`;
+            iframe.src = `https://player.twitch.tv/?clip=${clipId}&autoplay=${autoplay}&muted=${muted}&parent=${parent}`;
         } else {
             document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
         }
