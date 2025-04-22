@@ -30,9 +30,11 @@
     <script>
         const params = new URLSearchParams(window.location.search);
         const clipId = params.get('clip');
-        const parent = params.get('parent') || location.hostname;
         const autoplay = params.get('autoplay') || 'true';
         const muted = params.get('muted') || 'true';
+
+        // FORCER le parent à lebluxtv.github.io
+        const parent = "lebluxtv.github.io";
 
         if (clipId) {
             const iframe = document.getElementById('player');
