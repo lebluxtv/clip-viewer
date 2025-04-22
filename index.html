@@ -1,60 +1,59 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Clip Viewer</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            background-color: black;
-            height: 100%;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <title>Clip Viewer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      height: 100%;
+      overflow: hidden;
+    }
 
-        #player-container {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-        }
+    #player-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-        #player {
-            width: 110%;
-            height: 110%;
-            position: absolute;
-            top: -5%;
-            left: -5%;
-            border: none;
-            pointer-events: none; /* Bloque les interactions sur l'overlay */
-        }
-    </style>
+    #player {
+      position: absolute;
+      top: -12%; /* cache la partie haute (overlay Twitch) */
+      left: 0;
+      width: 100%;
+      height: 125%; /* pour combler l'espace bas perdu */
+      border: none;
+      transform: scale(1.03); /* léger zoom pour pas laisser de bord */
+    }
+  </style>
 </head>
 <body>
-    <div id="player-container">
-        <iframe
-            id="player"
-            allowfullscreen
-            scrolling="no"
-            frameborder="0"
-            src="">
-        </iframe>
-    </div>
+  <div id="player-container">
+    <iframe
+      id="player"
+      allowfullscreen
+      scrolling="no"
+      frameborder="0"
+      src="">
+    </iframe>
+  </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const clipId = params.get('clip');
-        const parent = params.get('parent') || location.hostname;
-        const autoplay = params.get('autoplay') || 'true';
-        const muted = params.get('muted') || 'true';
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const clipId = params.get('clip');
+    const parent = params.get('parent') || location.hostname;
+    const autoplay = params.get('autoplay') || 'true';
+    const muted = params.get('muted') || 'true';
 
-        if (clipId) {
-            const iframe = document.getElementById('player');
-            iframe.src = `https://player.twitch.tv/?clip=${clipId}&autoplay=${autoplay}&muted=${muted}&parent=lebluxtv.github.io`;
-
-        } else {
-            document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
-        }
-    </script>
+    if (clipId) {
+      const iframe = document.getElementById('player');
+      iframe.src = `https://player.twitch.tv/?clip=${clipId}&autoplay=${autoplay}&muted=${muted}&parent=${parent}`;
+    } else {
+      document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
+    }
+  </script>
 </body>
 </html>
