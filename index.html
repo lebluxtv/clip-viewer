@@ -88,7 +88,7 @@ document.body.appendChild(overlay);
 
 // Iframe avec autoplay silencieux
 const iframe = document.getElementById('player');
-iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=true`;
+iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=false`;
 
 // Intro de 2s → retire overlay, unmute + play
 setTimeout(() => {
