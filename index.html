@@ -42,9 +42,10 @@
       z-index: 1000;
       left: 0;
     }
+/*
     #topLimit { background-color: red; }
     #bottomLimit { background-color: yellow; }
-
+*/
     /* compte à rebours */
     #countdown {
       position: absolute;
@@ -63,10 +64,12 @@
 <body>
   <div id="clip-wrapper">
     <div id="clip-inner">
-      <video id="player" muted autoplay playsinline></video>
+      <video id="player" autoplay playsinline></video>
     </div>
+<!-- 
     <div id="topLimit"></div>
     <div id="bottomLimit"></div>
+ -->
     <div id="countdown"></div>
   </div>
 
@@ -81,10 +84,10 @@
     const topLimit    = parseInt(params.get('top')    || '1', 10);
     const bottomLimit = parseInt(params.get('bottom') || '1079', 10);
 
-    // positionner les lignes de repère
+    /*// positionner les lignes de repère
     document.getElementById('topLimit').style.top    = `${topLimit}px`;
     document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
-
+    */
     // overlay titre/auteur
     const overlay = document.createElement('div');
     Object.assign(overlay.style, {
