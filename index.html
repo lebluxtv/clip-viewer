@@ -86,71 +86,73 @@
 
     <script>
 const params = new URLSearchParams(window.location.search);
-const clipId = params.get('clip');
-const duration = parseFloat(params.get('duration'));
-const title = params.get('title') || "Titre inconnu";
-const author = params.get('author') || "Auteur inconnu";
-const parent = params.get('parent') || 'lebluxtv.github.io';
-const topLimit = parseInt(params.get('top') || '1');
-const bottomLimit = parseInt(params.get('bottom') || '1079');
+        const clipId = params.get('clip');
+        const duration = parseFloat(params.get('duration'));
+        const title = params.get('title') || "Titre inconnu";
+        const author = params.get('author') || "Auteur inconnu";
+        const parent = params.get('parent') || 'lebluxtv.github.io';
+        const topLimit = parseInt(params.get('top') || '1');
+        const bottomLimit = parseInt(params.get('bottom') || '1079');
 
-// Applique les repères
-document.getElementById('topLimit').style.top = `${topLimit}px`;
-document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
+        // Applique les repères
+        document.getElementById('topLimit').style.top = `${topLimit}px`;
+        document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
 
-// Affiche le titre + auteur pendant 2 secondes
-const overlay = document.createElement('div');
-overlay.style.position = 'absolute';
-overlay.style.top = '0';
-overlay.style.left = '0';
-overlay.style.width = '100%';
-overlay.style.height = '100%';
-overlay.style.background = 'rgba(0,0,0,0.8)';
-overlay.style.display = 'flex';
-overlay.style.flexDirection = 'column';
-overlay.style.justifyContent = 'center';
-overlay.style.alignItems = 'center';
-overlay.style.color = 'white';
-overlay.style.fontFamily = 'sans-serif';
-overlay.style.fontSize = '28px';
-overlay.style.zIndex = '1002';
-overlay.innerHTML = `<div>${title}</div><div style="font-size:18px;margin-top:10px;">par ${author}</div>`;
-document.body.appendChild(overlay);
+        // Affiche l’intro (titre + auteur)
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0,0,0,0.8)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.color = 'white';
+        overlay.style.fontFamily = 'sans-serif';
+        overlay.style.fontSize = '28px';
+        overlay.style.zIndex = '1002';
+        overlay.innerHTML = `<div>${title}</div><div style="font-size:18px;margin-top:10px;">par ${author}</div>`;
+        document.body.appendChild(overlay);
 
-// Précharger l'iframe sans autoplay
-const iframe = document.getElementById('player');
-iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=false&muted=false`;
+        // Précharge l’iframe sans autoplay
+        const iframe = document.getElementById('player');
+        iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=false&muted=false`;
 
-// Après 2 secondes → retirer intro + démarrer la vidéo + lancer le timer
-setTimeout(() => {
-    // Retire l’intro
-    document.body.removeChild(overlay);
+        // Lancer après 2 secondes
+        setTimeout(() => {
+            // Supprimer overlay d’intro
+            document.body.removeChild(overlay);
 
-    // Lancer la vidéo via postMessage
-    const twitchPlayer = iframe.contentWindow;
-    twitchPlayer.postMessage(JSON.stringify({
-        event: 'command',
-        func: 'play',
-        args: []
-    }), '*');
+            // Focus sur l’iframe (hack OBS / certains navigateurs)
+            iframe.focus();
 
-    // Lance le compte à rebours
-    if (!isNaN(duration)) {
-        const countdownEl = document.getElementById('countdown');
-        let timeLeft = Math.ceil(duration);
-        countdownEl.textContent = `${timeLeft}s`;
+            // Envoie la commande de lecture
+            iframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: 'play',
+                args: []
+            }), '*');
 
-        const interval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                countdownEl.textContent = "";
-            } else {
+            // Lancer le timer si durée valide
+            if (!isNaN(duration)) {
+                const countdownEl = document.getElementById('countdown');
+                let timeLeft = Math.ceil(duration);
                 countdownEl.textContent = `${timeLeft}s`;
+
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        countdownEl.textContent = "";
+                    } else {
+                        countdownEl.textContent = `${timeLeft}s`;
+                    }
+                }, 1000);
             }
-        }, 1000);
-    }
-}, 2000); // 2 secondes d’intro
+        }, 2000);
 
     </script>
 </body>
