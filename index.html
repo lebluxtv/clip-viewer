@@ -53,7 +53,7 @@
 
         if (clipId) {
             const iframe = document.getElementById('player');
-            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=true`;
+            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=false`;
         } else {
             document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
         }
