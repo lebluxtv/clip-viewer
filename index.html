@@ -81,10 +81,12 @@
     const duration    = parseFloat(params.get('duration'));
     const title       = params.get('title')  || "Titre inconnu";
     const author      = params.get('author') || "Auteur inconnu";
+    /*
     const topLimit    = parseInt(params.get('top')    || '1', 10);
     const bottomLimit = parseInt(params.get('bottom') || '1079', 10);
-
-    /*// positionner les lignes de repère
+    */
+    /*
+    // positionner les lignes de repère
     document.getElementById('topLimit').style.top    = `${topLimit}px`;
     document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
     */
@@ -147,7 +149,7 @@
           }
         }, 1000);
       }
-    }, 2000);
+    }, 300);
   </script>
 </body>
 </html>
