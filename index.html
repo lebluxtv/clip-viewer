@@ -40,13 +40,27 @@
             z-index: 1000;
             left: 0;
         }
-#bottomLimit {
+
+        #bottomLimit {
             position: absolute;
             width: 100%;
             height: 3px;
             background-color: yellow;
             z-index: 1000;
             left: 0;
+        }
+
+        #countdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 24px;
+            font-family: sans-serif;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 12px;
+            border-radius: 10px;
+            z-index: 1001;
         }
     </style>
 </head>
@@ -61,34 +75,52 @@
                 src="">
             </iframe>
         </div>
-        <!-- Ligne de repère -->
+
+        <!-- Repères -->
         <div id="topLimit"></div>
-<div id="bottomLimit"></div>
+        <div id="bottomLimit"></div>
+
+        <!-- Compteur -->
+        <div id="countdown"></div>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
-const clipId = params.get('clip');
-const parent = params.get('parent') || 'lebluxtv.github.io';
+        const clipId = params.get('clip');
+        const parent = params.get('parent') || 'lebluxtv.github.io';
 
-// 🔧 Valeur dynamique que tu peux modifier
-const topLimit = 1;
-const bottomLimit = 1079;
+        const topLimit = parseInt(params.get('top') || '1');
+        const bottomLimit = parseInt(params.get('bottom') || '1079');
+        const duration = parseFloat(params.get('duration'));
 
-// Affiche la ligne rouge en haut
-const topLimitLine = document.getElementById('topLimit');
-topLimitLine.style.top = `${topLimit}px`;
+        // Positionne les repères
+        document.getElementById('topLimit').style.top = `${topLimit}px`;
+        document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
 
-// Affiche la ligne jaune en bas
-const bottomLimitLine = document.getElementById('bottomLimit');
-bottomLimitLine.style.top = `${bottomLimit}px`;
+        // Lancer le player
+        if (clipId) {
+            const iframe = document.getElementById('player');
+            iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=false`;
+        } else {
+            document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
+        }
 
-if (clipId) {
-    const iframe = document.getElementById('player');
-    iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=false`;
-} else {
-    document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
-}
+        // Décompte en secondes
+        if (!isNaN(duration)) {
+            const countdownEl = document.getElementById('countdown');
+            let timeLeft = Math.ceil(duration);
+            countdownEl.textContent = `${timeLeft}s`;
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    countdownEl.textContent = "";
+                } else {
+                    countdownEl.textContent = `${timeLeft}s`;
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
