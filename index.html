@@ -137,7 +137,7 @@
 
       if (!isNaN(duration)) {
         const countdownEl = document.getElementById('countdown');
-        let timeLeft = Math.ceil(duration);
+        let timeLeft = Math.ceil(duration - 2);
         countdownEl.textContent = `${timeLeft}s`;
         const interval = setInterval(() => {
           timeLeft--;
