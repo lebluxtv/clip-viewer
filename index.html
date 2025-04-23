@@ -21,15 +21,24 @@
 
         #clip-inner {
             position: absolute;
-            top: -300px; /* masque la zone haute */
+            top: -300px;
             width: 100%;
-            height: calc(100% + 300px); /* donne l’impression d’une iframe plus grande */
+            height: calc(100% + 300px);
         }
 
         iframe {
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        #topLimit {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: red;
+            z-index: 1000;
+            left: 0;
         }
     </style>
 </head>
@@ -39,17 +48,26 @@
             <iframe
                 id="player"
                 allowfullscreen
-                scrolling="yes"
+                scrolling="no"
                 frameborder="0"
                 src="">
             </iframe>
         </div>
+        <!-- Ligne de repère -->
+        <div id="topLimit"></div>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
         const clipId = params.get('clip');
         const parent = params.get('parent') || 'lebluxtv.github.io';
+
+        // 🔧 Valeur dynamique que tu peux modifier
+        const topLimit = 50; // <-- CHANGE CETTE VALEUR pour ajuster la ligne
+
+        // Positionne dynamiquement la ligne rouge
+        const topLimitLine = document.getElementById('topLimit');
+        topLimitLine.style.top = `${topLimit}px`;
 
         if (clipId) {
             const iframe = document.getElementById('player');
