@@ -19,22 +19,22 @@
       overflow: hidden;
     }
 
-    /* cropping vertical (pour découper le haut et le bas du stream) */
+    /* on retire entièrement le cropping */
     #clip-inner {
       position: absolute;
-      top: -300px; /* tu peux ajuster si besoin */
+      top: 0;
       width: 100%;
-      height: calc(100% + 300px);
+      height: 100%;
     }
 
-    /* on utilise une balise video */
+    /* balise video en plein écran */
     #clip-inner video {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    /* tes deux lignes de repère */
+    /* lignes de repère */
     #topLimit, #bottomLimit {
       position: absolute;
       width: 100%;
@@ -103,32 +103,33 @@
 
     if (!manifest) {
       console.error('Pas d’URL de média fournie');
-    } 
-    // **Détection MP4** : si l’URL contient ".mp4", on le lit directement
+    }
+    // MP4 direct
     else if (manifest.match(/\.mp4(\?|$)/i)) {
       video.src = manifest;
+      video.load();  // force le chargement
     }
-    // sinon on suppose un HLS et on tente Hls.js
+    // HLS via hls.js
     else if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(manifest);
       hls.attachMedia(video);
     }
-    // fallback Safari / iOS
+    // fallback natif Safari/iOS
     else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = manifest;
+      video.load();
     }
     else {
       console.error('HLS non pris en charge');
     }
 
-    // après 2s : retirer l’overlay, démuter et lancer la vidéo + le countdown
+    // après 2s : retirer l’overlay, démuter + play + countdown
     setTimeout(() => {
       document.body.removeChild(overlay);
       video.muted = false;
       video.play().catch(()=>{});
 
-      // compte à rebours
       if (!isNaN(duration)) {
         const countdownEl = document.getElementById('countdown');
         let timeLeft = Math.ceil(duration);
