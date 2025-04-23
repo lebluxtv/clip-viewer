@@ -19,19 +19,22 @@
       overflow: hidden;
     }
 
+    /* cropping vertical (pour découper le haut et le bas du stream) */
     #clip-inner {
       position: absolute;
-      top: -300px;
+      top: -300px; /* tu peux ajuster si besoin */
       width: 100%;
       height: calc(100% + 300px);
     }
 
-    iframe {
+    /* on remplace l’iframe par une balise video */
+    #clip-inner video {
       width: 100%;
       height: 100%;
-      border: none;
+      object-fit: cover;
     }
 
+    /* tes deux lignes de repère */
     #topLimit, #bottomLimit {
       position: absolute;
       width: 100%;
@@ -39,10 +42,10 @@
       z-index: 1000;
       left: 0;
     }
-
     #topLimit { background-color: red; }
     #bottomLimit { background-color: yellow; }
 
+    /* compte à rebours */
     #countdown {
       position: absolute;
       top: 20px;
@@ -60,71 +63,78 @@
 <body>
   <div id="clip-wrapper">
     <div id="clip-inner">
-      <iframe id="player" allowfullscreen scrolling="no" frameborder="0" src=""></iframe>
+      <video id="player" muted autoplay playsinline></video>
     </div>
     <div id="topLimit"></div>
     <div id="bottomLimit"></div>
     <div id="countdown"></div>
   </div>
 
+  <!-- hls.js depuis CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-    const params = new URLSearchParams(window.location.search);
-const clipId = params.get('clip');
-const duration = parseFloat(params.get('duration'));
-const title = params.get('title') || "Titre inconnu";
-const author = params.get('author') || "Auteur inconnu";
-const parent = params.get('parent') || 'lebluxtv.github.io';
-const topLimit = parseInt(params.get('top') || '1');
-const bottomLimit = parseInt(params.get('bottom') || '1079');
+    const params     = new URLSearchParams(window.location.search);
+    const manifest   = params.get('m3u8');
+    const duration   = parseFloat(params.get('duration'));
+    const title      = params.get('title')  || "Titre inconnu";
+    const author     = params.get('author') || "Auteur inconnu";
+    const topLimit   = parseInt(params.get('top')    || '1', 10);
+    const bottomLimit= parseInt(params.get('bottom') || '1079', 10);
 
-document.getElementById('topLimit').style.top = `${topLimit}px`;
-document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
+    // positionner les lignes de repère
+    document.getElementById('topLimit').style.top    = `${topLimit}px`;
+    document.getElementById('bottomLimit').style.top = `${bottomLimit}px`;
 
-// Overlay intro
-const overlay = document.createElement('div');
-overlay.style = 'position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;font-size:56px;z-index:1002';
-overlay.innerHTML = `<div>${title}</div><div style="font-size:36px;margin-top:10px;">par ${author}</div>`;
-document.body.appendChild(overlay);
+    // overlay titre/auteur
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+      position: 'absolute', top:0, left:0, width:'100%', height:'100%',
+      background:'rgba(0,0,0,0.8)', display:'flex',
+      flexDirection:'column', justifyContent:'center', alignItems:'center',
+      color:'white', fontFamily:'sans-serif', fontSize:'56px', zIndex:1002
+    });
+    overlay.innerHTML = `
+      <div>${title}</div>
+      <div style="font-size:36px;margin-top:10px;">par ${author}</div>
+    `;
+    document.body.appendChild(overlay);
 
-// Iframe avec autoplay silencieux
-const iframe = document.getElementById('player');
-iframe.src = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${parent}&autoplay=true&muted=false`;
+    // initialiser le player HLS
+    const video = document.getElementById('player');
+    if (!manifest) {
+      console.error('Pas d’URL m3u8 fournie');
+    } else if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(manifest);
+      hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = manifest;
+    } else {
+      console.error('HLS non pris en charge');
+    }
 
-// Intro de 2s → retire overlay, unmute + play
-setTimeout(() => {
-    document.body.removeChild(overlay);
+    // après 2s : retirer l’overlay, démuter et lancer la vidéo + le countdown
+    setTimeout(() => {
+      document.body.removeChild(overlay);
+      video.muted = false;
+      video.play().catch(()=>{});
 
-    const twitchPlayer = iframe.contentWindow;
-    twitchPlayer.postMessage(JSON.stringify({
-        event: 'command',
-        func: 'setMuted',
-        args: [false]
-    }), '*');
-
-    twitchPlayer.postMessage(JSON.stringify({
-        event: 'command',
-        func: 'play',
-        args: []
-    }), '*');
-
-    // Décompte
-    if (!isNaN(duration)) {
+      // compte à rebours
+      if (!isNaN(duration)) {
         const countdownEl = document.getElementById('countdown');
         let timeLeft = Math.ceil(duration);
         countdownEl.textContent = `${timeLeft}s`;
-
         const interval = setInterval(() => {
-            timeLeft--;
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                countdownEl.textContent = "";
-            } else {
-                countdownEl.textContent = `${timeLeft}s`;
-            }
+          timeLeft--;
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            countdownEl.textContent = "";
+          } else {
+            countdownEl.textContent = `${timeLeft}s`;
+          }
         }, 1000);
-    }
-}, 2000);
-
+      }
+    }, 2000);
   </script>
 </body>
 </html>
