@@ -27,7 +27,7 @@
       height: calc(100% + 300px);
     }
 
-    /* on remplace l’iframe par une balise video */
+    /* on utilise une balise video */
     #clip-inner video {
       width: 100%;
       height: 100%;
@@ -73,13 +73,13 @@
   <!-- hls.js depuis CDN -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
-    const params     = new URLSearchParams(window.location.search);
-    const manifest   = params.get('m3u8');
-    const duration   = parseFloat(params.get('duration'));
-    const title      = params.get('title')  || "Titre inconnu";
-    const author     = params.get('author') || "Auteur inconnu";
-    const topLimit   = parseInt(params.get('top')    || '1', 10);
-    const bottomLimit= parseInt(params.get('bottom') || '1079', 10);
+    const params      = new URLSearchParams(window.location.search);
+    const manifest    = params.get('m3u8');
+    const duration    = parseFloat(params.get('duration'));
+    const title       = params.get('title')  || "Titre inconnu";
+    const author      = params.get('author') || "Auteur inconnu";
+    const topLimit    = parseInt(params.get('top')    || '1', 10);
+    const bottomLimit = parseInt(params.get('bottom') || '1079', 10);
 
     // positionner les lignes de repère
     document.getElementById('topLimit').style.top    = `${topLimit}px`;
@@ -88,7 +88,7 @@
     // overlay titre/auteur
     const overlay = document.createElement('div');
     Object.assign(overlay.style, {
-      position: 'absolute', top:0, left:0, width:'100%', height:'100%',
+      position:'absolute', top:0, left:0, width:'100%', height:'100%',
       background:'rgba(0,0,0,0.8)', display:'flex',
       flexDirection:'column', justifyContent:'center', alignItems:'center',
       color:'white', fontFamily:'sans-serif', fontSize:'56px', zIndex:1002
@@ -99,17 +99,26 @@
     `;
     document.body.appendChild(overlay);
 
-    // initialiser le player HLS
     const video = document.getElementById('player');
+
     if (!manifest) {
-      console.error('Pas d’URL m3u8 fournie');
-    } else if (Hls.isSupported()) {
+      console.error('Pas d’URL de média fournie');
+    } 
+    // **Détection MP4** : si l’URL contient ".mp4", on le lit directement
+    else if (manifest.match(/\.mp4(\?|$)/i)) {
+      video.src = manifest;
+    }
+    // sinon on suppose un HLS et on tente Hls.js
+    else if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(manifest);
       hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    }
+    // fallback Safari / iOS
+    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = manifest;
-    } else {
+    }
+    else {
       console.error('HLS non pris en charge');
     }
 
