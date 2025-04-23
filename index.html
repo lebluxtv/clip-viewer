@@ -1,65 +1,45 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Twitch Clip Cleaner</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #clip-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #clip-inner {
-      position: absolute;
-      top: -60px; /* Masque la zone de l'overlay */
-      width: 100%;
-      height: calc(100% + 60px); /* Fournit plus de hauteur au player */
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Clip Viewer</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            height: 100%;
+            overflow: hidden;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-  <div id="clip-wrapper">
-    <div id="clip-inner">
-      <iframe
+    <iframe
         id="player"
         allowfullscreen
         scrolling="no"
         frameborder="0"
         src="">
-      </iframe>
-    </div>
-  </div>
+    </iframe>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const clipId = params.get('clip');
-    const parent = params.get('parent') || 'lebluxtv.github.io';
-    const autoplay = params.get('autoplay') || 'true';
-    const muted = params.get('muted') || 'true';
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const clipId = params.get('clip');
+        const parent = params.get('parent') || location.hostname;
+        const autoplay = params.get('autoplay') || 'true';
+        const muted = params.get('muted') || 'true';
 
-    if (clipId) {
-      const iframe = document.getElementById('player');
-      iframe.src = `https://player.twitch.tv/?clip=${clipId}&autoplay=${autoplay}&muted=${muted}&parent=${parent}`;
-    } else {
-      document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
-    }
-  </script>
+        if (clipId) {
+            const iframe = document.getElementById('player');
+            iframe.src = `https://player.twitch.tv/?clip=${clipId}&autoplay=${autoplay}&muted=${muted}&parent=${parent}`;
+        } else {
+            document.body.innerHTML = "<h1 style='color:white; text-align:center; margin-top:40vh;'>No clip specified</h1>";
+        }
+    </script>
 </body>
 </html>
